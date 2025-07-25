@@ -1,0 +1,16 @@
+{
+  "name": "qwicpay-one",
+  "version": "1.2.4",
+  "description": "",
+  "main": "qwicpay-one.php",
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start"
+  },
+  "keywords": [],
+  "author": "QwicPay Pty Ltd",
+  "license": "GPLv2 or later",
+  "devDependencies": {
+    "@wordpress/scripts": "^30.20.0"
+  }
+}
