@@ -198,6 +198,37 @@ function qwicpay_init_gateway_class() {
 
         /**
          * Handels payment call
+         * @since 1.2.20
+         */
+
+        public function is_available() {
+            // First check parent (like whether plugin is enabled)
+            if (!parent::is_available()) {
+                return false;
+            }
+
+            // Remote status check
+            $response = wp_remote_get(
+                HOST . "/one/merchant/isup/{$this->stage}",
+                [
+                    'timeout' => 5,
+                    'headers' => [
+                        'merchant_id'  => $this->merchant_id,
+                        'merchant_key' => $this->api_key,
+                    ]
+                ]
+            );
+
+            // Disable gateway if response is bad
+            if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) {
+                return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * Handels payment call
          * @since 1.0.4
          */
 
