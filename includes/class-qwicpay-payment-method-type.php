@@ -114,9 +114,9 @@ final class QwicPayPaymentMethodType extends AbstractPaymentMethodType {
             'name'        => $this->name,
             'title'       => $this->gateway->title,
             'description' => $this->gateway->description,
-            'icon'        => plugin_dir_url( dirname( __FILE__ ) ) . 'assets/qwicpay-icon.png', // Adjust path for icon
+            'icon'        => plugin_dir_url( dirname( __FILE__ ) ) . 'assets/QwicPayQ.svg', 
             'supports'    => $this->gateway->supports,
-            'stage'       => $this->gateway->get_option( 'stage' ), // Pass stage to JS if needed
+            'stage'       => $this->gateway->get_option( 'stage' ),
         ];
     }
 
@@ -136,7 +136,7 @@ final class QwicPayPaymentMethodType extends AbstractPaymentMethodType {
     }
 
     // If you uncommented the hook above, define this method:
-    
+
     // public function process_payment_with_context( $context, &$result ) {
     //     if ( $context->payment_method === $this->name ) {
     //         // Example of accessing custom data sent from JS:

@@ -3,7 +3,7 @@
  * Plugin Name: QwicPay One
  * Plugin URI: https://qwicpay.com/
  * Description: Adds a QwicPay ONE payment method to Woocommerce
- * Version: 1.2.4
+ * Version: 1.2.10
  * Author: QwicPay Pty Ltd
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -63,7 +63,7 @@ function qwicpay_one_check_requirements() {
  * Defines QwicPay Gateway Class
  * @since 1.0.0
  */
-final function qwicpay_init_gateway_class() {
+function qwicpay_init_gateway_class() {
 
     class WC_Gateway_QwicPay extends WC_Payment_Gateway {
         protected $merchant_id;
@@ -378,3 +378,18 @@ add_action('plugins_loaded', function () {
     }
 
 }, 10); // Use priority 10 or higher to ensure WooCommerce is fully loaded.
+
+
+/**
+ * Custom font
+ * @since 1.2.10
+*/
+add_action( 'enqueue_block_assets', function() {
+    wp_enqueue_style(
+        'qwicpay-fonts',
+        'https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap',
+        [],
+        null
+    );
+} );
+
