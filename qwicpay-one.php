@@ -3,7 +3,7 @@
  * Plugin Name: QwicPay One
  * Plugin URI: https://qwicpay.com/
  * Description: Adds a QwicPay ONE payment method to Woocommerce
- * Version: 1.2.10
+ * Version: 1.2.42
  * Author: QwicPay Pty Ltd
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,7 +12,7 @@
  */
 
 
-const HOST = 'https://5e080c10ef6f.ngrok-free.app';
+const HOST = 'https://ice.qwicpay.com';
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
@@ -79,12 +79,12 @@ function qwicpay_init_gateway_class() {
             $this->id = 'qwicpay';
             $this->method_title = 'QwicPay';
             $this->has_fields = false;
-            $this->description =  'Pay securely via QwicPay';
+            $this->description =  'Credit | Debit | Cards stored across any QwicPay merchant | Apple Pay | Samsung Pay ';
+            $this->icon = plugin_dir_url( dirname( __FILE__ ) ) .  'qwicpay-one/assets/qwicpay-icon.webp';
 
             $this->init_form_fields();
             $this->init_settings();
 
-            $this->enabled = $this->get_option('enabled');
             $this->title = $this->get_option('title');
             $this->merchant_id = $this->get_option('merchant_id');
             $this->api_key = $this->get_option('api_key');
@@ -145,12 +145,6 @@ function qwicpay_init_gateway_class() {
 
         public function init_form_fields() {
             $this->form_fields = array(
-                'enabled' => array(
-                    'title'   => __('Enable/Disable', 'qwicpay-one'),
-                    'type'    => 'checkbox',
-                    'label'   => __('Enable QwicPay payment gateway', 'qwicpay-one'),
-                    'description' => '',
-                ),
                 'merchant_id' => array(
                     'title' => 'Merchant ID',
                     'type' => 'text',
@@ -304,6 +298,10 @@ function qwicpay_init_gateway_class() {
             $calculated_hmac = hash_hmac('sha256', $body, $this->api_key);
 
             //verify HMAC with API KEY
+            error_log("QwicPay HMAC Debug:");
+            error_log("Raw Body: " . $body);
+            error_log("Calculated HMAC: " . $calculated_hmac);
+            error_log("Received HMAC: " . $received_hmac);
 
             if (!hash_equals($calculated_hmac, $received_hmac)) {
                 status_header(403);

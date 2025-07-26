@@ -114,7 +114,8 @@ final class QwicPayPaymentMethodType extends AbstractPaymentMethodType {
             'name'        => $this->name,
             'title'       => $this->gateway->title,
             'description' => $this->gateway->description,
-            'icon'        => plugin_dir_url( dirname( __FILE__ ) ) . 'assets/QwicPayQ.svg', 
+            'icon'        => plugin_dir_url( dirname( __FILE__ ) ) . 'assets/qwicpay-icon.webp', 
+            'iconBase'    => plugin_dir_url( dirname( __FILE__ ) ) . 'assets/icons/', 
             'supports'    => $this->gateway->supports,
             'stage'       => $this->gateway->get_option( 'stage' ),
         ];
