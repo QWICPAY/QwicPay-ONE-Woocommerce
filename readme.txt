@@ -1,17 +1,17 @@
 === QwicPay ONE ===
 Contributors: qwicpay, jbeira
-Tags: payment gateway, checkout, WooCommerce, QwicPay, Apple Pay, Samsung Pay, card payments
+Tags: payment gateway, QwicPay, Apple Pay, Samsung Pay, Card
 Requires at least: 5.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 Tested up to: 6.8
-Stable tag: 1.2.15
+Stable tag: 1.2.46
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 
 
-Enable QwicPay ONE checkout on your WooCommerce store with secure, fast, and PCI-DSS compliant payments. Accept Apple Pay, Samsung Pay, cards, and stored cards.
+Enable QwicPay ONE on your WooCommerce checkout with secure, compliant payments. Accept Apple Pay, Samsung Pay, cards, and stored cards.
 
 == Description ==
 

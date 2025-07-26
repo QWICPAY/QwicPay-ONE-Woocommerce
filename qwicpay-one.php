@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: QwicPay One
+ * Plugin Name: QwicPay ONE
  * Plugin URI: https://qwicpay.com/
  * Description: Adds the QwicPay ONE payment method to Woocommerce
- * Version: 1.2.44
+ * Version: 1.2.46
  * Author: QwicPay Pty Ltd
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -325,19 +325,17 @@ function qwicpay_init_gateway_class() {
         public function handle_qwicpay_response() {
             $body = file_get_contents('php://input');
             $data = json_decode($body, true);
-            $received_hmac = $_SERVER['HTTP_X_QWICPAY_SIGNATURE'] ?? '';
-            $calculated_hmac = hash_hmac('sha256', $body, $this->api_key);
-            
+            $received_hmac = '';
+
+			if ( isset( $_SERVER['HTTP_X_QWICPAY_SIGNATURE'] ) ) {
+				$received_hmac = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_QWICPAY_SIGNATURE'] ) );
+			}
             //verify HMAC with API KEY
             
 
             if (!hash_equals($calculated_hmac, $received_hmac)) {
                 status_header(403);
                 echo 'Invalid HMAC';
-
-                error_log("QwicPay Invalid HMAC Debug:");
-                error_log("Raw Body: " . $body);
-                error_log("Received HMAC: " . $received_hmac);
                 exit;
             }
 
