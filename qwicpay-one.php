@@ -2,8 +2,8 @@
 /**
  * Plugin Name: QwicPay One
  * Plugin URI: https://qwicpay.com/
- * Description: Adds a QwicPay ONE payment method to Woocommerce
- * Version: 1.2.42
+ * Description: Adds the QwicPay ONE payment method to Woocommerce
+ * Version: 1.2.44
  * Author: QwicPay Pty Ltd
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -79,7 +79,7 @@ function qwicpay_init_gateway_class() {
             $this->id = 'qwicpay';
             $this->method_title = 'QwicPay';
             $this->has_fields = false;
-            $this->description =  'Credit | Debit | Cards stored across any QwicPay merchant | Apple Pay | Samsung Pay ';
+            $this->description =  'Credit & Debit Cards | Cards stored across any QwicPay merchant | Apple Pay | Samsung Pay ';
             $this->icon = plugin_dir_url( dirname( __FILE__ ) ) .  'qwicpay-one/assets/qwicpay-icon.webp';
 
             $this->init_form_fields();
@@ -156,8 +156,8 @@ function qwicpay_init_gateway_class() {
                     'description' => '',
                 ),
                 'stage' => array(
-                    'name'    => 'Stage',
-                    'desc'    => 'In Test, no payments are accepted. Use with caution',
+                    'title'    => 'Stage',
+                    'description'    => 'In Test, no payments are accepted. Use with caution',
                     'id'      => 'qwicpay_stage',
                     'type'    => 'select',
                     'options' => array(
@@ -327,21 +327,23 @@ function qwicpay_init_gateway_class() {
             $data = json_decode($body, true);
             $received_hmac = $_SERVER['HTTP_X_QWICPAY_SIGNATURE'] ?? '';
             $calculated_hmac = hash_hmac('sha256', $body, $this->api_key);
-
+            
             //verify HMAC with API KEY
-            error_log("QwicPay HMAC Debug:");
-            error_log("Raw Body: " . $body);
-            error_log("Calculated HMAC: " . $calculated_hmac);
-            error_log("Received HMAC: " . $received_hmac);
+            
 
             if (!hash_equals($calculated_hmac, $received_hmac)) {
                 status_header(403);
                 echo 'Invalid HMAC';
+
+                error_log("QwicPay Invalid HMAC Debug:");
+                error_log("Raw Body: " . $body);
+                error_log("Received HMAC: " . $received_hmac);
                 exit;
             }
 
             $order_id = $data['metadata']['order_id'] ?? null;
             $status = $data['payment']['transactionStatus'] ?? null;
+            $stage = $data['stage']?? 'UNKNOWN';
 
             if (!$order_id || $status === null) {
                 status_header(400);
@@ -359,7 +361,7 @@ function qwicpay_init_gateway_class() {
             if ((int)$status === 1) { // Approved
                 if ($order->get_status() !== 'processing' && $order->get_status() !== 'completed') {
                     $order->payment_complete();
-                    $order->add_order_note('QwicPay: Payment approved.');
+                    $order->add_order_note("QwicPay: Payment approved. Stage: $stage");
                 }
             } elseif ((int)$status === 2 || (int)$status === 3 || (int)$status === 4) {
                 $order->update_status('cancelled', 'QwicPay: Payment declined or cancelled.');

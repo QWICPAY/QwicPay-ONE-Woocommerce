@@ -1,6 +1,6 @@
-=== QwicPay Checkout ===
-Contributors: qwicpay, jbeira, enrico1109
-Tags: qwicpay, instant checkout, woocommerce, payment, south africa
+=== QwicPay ONE ===
+Contributors: qwicpay, jbeira
+Tags: payment gateway, checkout, WooCommerce, QwicPay, Apple Pay, Samsung Pay, card payments
 Requires at least: 5.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
@@ -10,130 +10,95 @@ License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 
-This integration enables your WooCommerce store to offer QwicPay Instant Checkout and join our ecosystem.
+
+Enable QwicPay ONE checkout on your WooCommerce store with secure, fast, and PCI-DSS compliant payments. Accept Apple Pay, Samsung Pay, cards, and stored cards.
 
 == Description ==
 
-QwicPay Checkout for WooCommerce adds an instant checkout option to your store, letting customers checkout directly from the cart page with their saved payment methods. It connects securely to QwicPay's systems and supports passing cart contents, promo codes, and currency.
+This integration enables your WooCommerce store to offer **QwicPay ONE**, a modern checkout option with seamless redirection to a secure payment page.  
+Accept Apple Pay, Samsung Pay, stored cards, and standard credit/debit cards using QwicPay’s PCI-DSS Level 1 vault.  
+Merchants can use QwicPay's own TPPP or their own MID.
 
-= 🚀 Features =
-* Adds a **QwicPay Checkout Faster** button to the cart page.
-* Redirects customers to QwicPay’s secure instant checkout.
-* Passes cart contents, notes, promo codes, and currency.
-* Fully configurable and easy to install.
-* Direct Merchant portal access from WordPress.
+> ⚠️ **IMPORTANT:** A QwicPay merchant account is required. Sign up at [https://www.qwicpay.com](https://www.qwicpay.com).
+
+**Key Features:**
+
+- Adds the **QwicPay ONE** payment method to your WooCommerce checkout.
+- Redirect-based secure payments using QwicPay's hosted payment page.
+- Accepts Apple Pay, Samsung Pay, card payments, and stored QwicPay cards.
+- Store cards in QwicPay's PCI-DSS Level 1 vault.
+- Provides direct access to your merchant portal from WordPress.
+- Fully configurable and easy to install.
+- Supports block-based checkout (v1.2+).
 
 == Installation ==
 
-1. Download the ZIP and upload via **Plugins → Add New → Upload Plugin**.
-2. Activate the plugin in **Plugins → Installed Plugins**.
-3. Go to **QwicPay → Settings** to enter your Merchant ID and other options.
-4. Activate the plugin and ensure status becomes "Active".
+1. Download the plugin ZIP and upload it via **Plugins → Add New → Upload Plugin**.
+2. Activate the plugin from **Plugins → Installed Plugins**.
+3. Navigate to **WooCommerce → Settings → Payments → QwicPay**.
+4. Enter your QwicPay Merchant ID and Merchant Key, then **Save changes**.
+5. Enable the payment method and confirm the status becomes `Active`.
 
-= Permalinks =
-WordPress permalinks must be set to a human-readable format.
-Go to **Settings → Permalinks** and choose any option **other than "Plain"**.
-The **"Day and name"** structure is a great default and works well with QwicPay.
-
-= 🔗 Checkout Endpoints =
-| Endpoint Purpose | Endpoint Slug |
-| ---------------- | ------------- |
-| Pay              | order-pay     |
-| Order Received   | order-received|
-
-**To set these endpoints:**
-1. Go to WooCommerce → Settings → Advanced → Checkout Endpoints.
-2. Ensure `order-pay` and `order-received` slugs are listed.
-
-= Plugin Options =
-| Option         | Description                                      | Default |
-| -------------- | ------------------------------------------------ | ------- |
-| Hook Location  | Where to display the button                      | woocommerce_cart_totals_after_order_total |
-| Merchant ID    | Your QwicPay merchant ID                         | (empty — must be set) |
-| Stage          | Test or Production                               | Test    |
-| Currency       | Checkout currency                                | ZAR     |
-| Button Style   | QwicPay button image                             | Blue round button SVG |
-
-
-== Custom Hook: qwicpay_cart_hook ==
-
-The QwicPay Checkout plugin includes an optional custom action hook for advanced layout control:
-
-=== Hook Name ===
-
-qwicpay_cart_hook
-
-=== Description ===
-
-This hook allows you to control exactly where the QwicPay button appears on the cart page by inserting it manually in your theme or plugin.
-
-=== How to Use ===
-
-1. Enable the hook:
-   - Navigate to WooCommerce → Settings → QwicPay Settings.
-   - Under "Hook Location", choose "QwicPay Custom hook".
-
-2. Insert this in your cart template:
-   do_action('qwicpay_cart_hook');
-
-QwicPay will automatically render the button here when this option is enabled.
+**Note:**  
+Make sure WordPress permalinks are set to a human-readable format.  
+Go to **Settings → Permalinks** and select any option **other than "Plain"**.  
+We recommend using **"Day and name"**.
 
 == Frequently Asked Questions ==
 
-= Can I change the button style? =
-Yes! Choose from 4 styles hosted by QwicPay.
+= Do I need a QwicPay account? =  
+Yes. You must register for a merchant account at [https://www.qwicpay.com](https://www.qwicpay.com).
+
+= Is QwicPay PCI-compliant? =  
+Yes, QwicPay is PCI-DSS Level 1 compliant. All card data is stored and processed securely.
+
+= Can I accept Apple Pay and Samsung Pay? =  
+Yes, provided your merchant account is configured to support those methods.
+
+= Can I use my own MID instead of QwicPay’s processing? =  
+Yes. QwicPay supports both third-party processing and your own acquiring account.
 
 
-== External Services ==
 
-This plugin connects to QwicPay’s external API services to enable secure instant checkout functionality.
+== Plugin Options ==
 
-It makes the following remote requests:
-- https://ice.qwicpay.com/isup/{merchant_id} — to check service uptime
-- https://ice.qwicpay.com/app/woo/status/{merchant_id} — to validate merchant setup
-- https://ice.qwicpay.com/app/woo/checkout — customer checkout redirect
-- https://ice.qwicpay.com/app/woo/link/{merchant_id} — activation link
-- https://map.qwicpay.com — embedded iframe in Merchant Access Portal
-
-**Data sent:** Only the merchant ID (set by the admin). No customer or order data is transmitted to QwicPay's servers from the WordPress site.
-
-**Service Provider:** QwicPay Pty Ltd  
-[Privacy Policy](https://qwicpay.com/privacy)  
-[Terms of Use](https://qwicpay.com/tos)
-
-
+| Option        | Description                                  | Default    |
+| ------------- | --------------------------------------------- | ---------- |
+| Merchant ID   | Your QwicPay merchant identifier              | _(empty)_  |
+| Merchant KEY  | Your QwicPay merchant API key                 | _(empty)_  |
+| Stage         | Test or Production environment                | `Test`     |
 
 == Changelog ==
 
-= 1.2.12 =
-* Added full/half-width rendering via separate callbacks.
-* Refactored shared renderer for button HTML.
+= 1.2.40 =
+* Block styling updates and payment logos.
 
-= 1.1.12 =
-* Introduced dedicated admin menu with QwicPay icon.
-* Merchant Access Portal page with iframe.
+= 1.2.0 =
+* Introduced block checkout support.
 
 = 1.1.8 =
-* Initial top-level menu and submenus.
+* Added uptime monitoring and HMAC signature verification.
 
 = 1.0.0 =
-* Initial release: settings tab, button placement, uptime check.
+* Initial release: legacy method and basic settings.
 
 == Upgrade Notice ==
 
-= 1.2.12 =
-Latest version with width options and button renderer improvements.
+= 1.2.40 =
+Block support and visual updates added. Update recommended for newer WooCommerce versions.
 
+== License ==
 
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Support ==
 
-For assistance:
-* Email: support@qwicpay.com
-* Website: https://qwicpay.com
+If you need help integrating or using QwicPay ONE:
 
-== Contributors ==
-Thanks to community members:
-* @Enrico1109 — WooCommerce initial settings menu
+* Email: [support@qwicpay.com](mailto:support@qwicpay.com)
+* Website: [https://qwicpay.com](https://qwicpay.com)
 
-Made with care by QwicPay (https://qwicpay.com)
+---
+
+Made with ❤️ by [QwicPay](https://qwicpay.com)
