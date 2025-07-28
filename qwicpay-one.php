@@ -331,7 +331,7 @@ function qwicpay_init_gateway_class() {
 				$received_hmac = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_QWICPAY_SIGNATURE'] ) );
 			}
             //verify HMAC with API KEY
-            
+            $calculated_hmac = hash_hmac('sha256', $body, $this->api_key);
 
             if (!hash_equals($calculated_hmac, $received_hmac)) {
                 status_header(403);
