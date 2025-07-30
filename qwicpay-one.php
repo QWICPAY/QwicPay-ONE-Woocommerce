@@ -3,7 +3,7 @@
  * Plugin Name: QwicPay ONE
  * Plugin URI: https://qwicpay.com/
  * Description: Adds the QwicPay ONE payment method to Woocommerce
- * Version: 1.2.46
+ * Version: 1.2.5
  * Author: QwicPay Pty Ltd
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -80,12 +80,12 @@ function qwicpay_init_gateway_class() {
             $this->method_title = 'QwicPay';
             $this->has_fields = false;
             $this->description =  'Credit & Debit Cards | Cards stored across any QwicPay merchant | Apple Pay | Samsung Pay ';
-            $this->icon = plugin_dir_url( dirname( __FILE__ ) ) .  'qwicpay-one/assets/qwicpay-icon.webp';
+            $this->icon = plugin_dir_url( dirname( __FILE__ ) ) .  'qwicpay-one/assets/qwicpay-icon-new.webp';
+            $this->title =  'QwicPay';
 
             $this->init_form_fields();
             $this->init_settings();
 
-            $this->title = $this->get_option('title');
             $this->merchant_id = $this->get_option('merchant_id');
             $this->api_key = $this->get_option('api_key');
             $this->stage = $this->get_option('stage');
@@ -323,51 +323,84 @@ function qwicpay_init_gateway_class() {
          */
 
         public function handle_qwicpay_response() {
-            $body = file_get_contents('php://input');
-            $data = json_decode($body, true);
-            $received_hmac = '';
+           $body = file_get_contents('php://input');
 
-			if ( isset( $_SERVER['HTTP_X_QWICPAY_SIGNATURE'] ) ) {
-				$received_hmac = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_QWICPAY_SIGNATURE'] ) );
-			}
-            //verify HMAC with API KEY
-            $calculated_hmac = hash_hmac('sha256', $body, $this->api_key);
-
-            if (!hash_equals($calculated_hmac, $received_hmac)) {
-                status_header(403);
-                echo 'Invalid HMAC';
-                exit;
-            }
-
-            $order_id = $data['metadata']['order_id'] ?? null;
-            $status = $data['payment']['transactionStatus'] ?? null;
-            $stage = $data['stage']?? 'UNKNOWN';
-
-            if (!$order_id || $status === null) {
+            if (empty($body)) {
                 status_header(400);
-                echo 'Missing data';
+                echo 'Empty request body';
                 exit;
             }
 
-            $order = wc_get_order($order_id);
-            if (!$order) {
-                status_header(404);
-                echo 'Order not found';
-                exit;
-            }
+    // Decode JSON
+        $data = json_decode($body, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            status_header(400);
+            echo 'Invalid JSON';
+            exit;
+        }
 
-            if ((int)$status === 1) { // Approved
-                if ($order->get_status() !== 'processing' && $order->get_status() !== 'completed') {
-                    $order->payment_complete();
-                    $order->add_order_note("QwicPay: Payment approved. Stage: $stage");
-                }
-            } elseif ((int)$status === 2 || (int)$status === 3 || (int)$status === 4) {
-                $order->update_status('cancelled', 'QwicPay: Payment declined or cancelled.');
-            }
+    // Get HMAC from headers
+        $received_key = '';
+        if (isset($_SERVER['HTTP_KEY'])) {
+            $received_key = sanitize_text_field(wp_unslash($_SERVER['HTTP_KEY']));
+        }
 
-            wp_send_json(array(
-                'redirect' => $order->get_checkout_order_received_url()
-            ));
+            // Verify API key
+        if ($received_key !== $this->api_key) {
+            status_header(403);
+            echo 'Invalid API Key';
+            exit;
+        }
+
+        if (empty($this->api_key)) {
+            status_header(403);
+            echo 'Missing API KEY';
+            exit;
+        }
+
+
+    // Extract fields
+    $order_id = $data['metadata']['order_id'] ?? null;
+    $status   = $data['payment']['transactionStatus'] ?? null;
+    $stage    = $data['stage'] ?? 'UNKNOWN';
+
+    if (!$order_id || $status === null) {
+        status_header(400);
+        echo 'Missing required payment data';
+        exit;
+    }
+
+    $order = wc_get_order($order_id);
+    if (!$order) {
+        status_header(404);
+        echo 'Order not found';
+        exit;
+    }
+
+    // Process based on transaction status
+    switch ((int)$status) {
+        case 1: // Approved
+            if (!in_array($order->get_status(), ['processing', 'completed'], true)) {
+                $order->payment_complete();
+                $order->add_order_note("QwicPay: Payment approved. Stage: $stage");
+            }
+            break;
+
+        case 2: // Declined
+        case 3: // Cancelled
+        case 4: // Failed
+            $order->update_status('cancelled', 'QwicPay: Payment declined or cancelled.');
+            break;
+
+        default:
+            $order->add_order_note("QwicPay: Received unknown payment status: $status. Stage: $stage");
+            break;
+    }
+
+    // Respond with redirect URL
+    wp_send_json(array(
+        'redirect' => $order->get_checkout_order_received_url(),
+    ));
         }
     }
 
